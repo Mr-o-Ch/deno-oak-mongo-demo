@@ -1,12 +1,22 @@
+---
+title: 基于 Deno 构建 HTTP Server 实践指南
+date: 2020-07-29 06:55:25
+categories:
+  - [Deno]
+tags:
+  - Deno
+  - 掘金专栏
+---
+
 ![](https://i.loli.net/2020/07/29/Vn7jhOu3Z2c6pTe.png)
 
 <!--more-->
 
-大家好，我是俊宁，这是一篇介绍如何使用 Deno 构建 HTTP Server 的实践指南，如果你还不了解Deno是什么，可以移步我的另一篇[Deno入门文章](https://juejin.im/post/5f1d4065f265da22d8344dc6)。
+大家好，我是俊宁，这是一篇介绍如何使用 Deno 构建 HTTP Server 的实践指南，如果你还不了解Deno是什么，可以移步我的另一篇 [Deno入门文章](https://juejin.im/post/5f1d4065f265da22d8344dc6)。
 
 本文还使用到了 Docker，如果不熟悉可以看一下 [一个前端工程师的Docker学习笔记【持续更新】](https://juejin.im/post/6844904111243001869)。
 
-mongodb 入门可以看一下 [MongoDB 教程](https://www.runoob.com/mongodb/mongodb-tutorial.html)
+mongodb 入门可以看一下 [MongoDB 教程](https://www.runoob.com/mongodb/mongodb-tutorial.html)。
 
 ## 环境准备
 
@@ -263,6 +273,8 @@ app.listen({ port: 8899 });
 
 ### [deno-drash](https://github.com/drashland/deno-drash)
 
+A REST microframework for Deno's HTTP server with zero dependencies.
+
 ```ts
 import { Drash } from "https://deno.land/x/drash@v1.x/mod.ts";
 
@@ -288,6 +300,8 @@ console.log(`🦕 drash server running at http://127.0.0.1:8888/ 🦕`);
 ```
 
 ### [abc](https://github.com/zhmushan/abc)
+
+A better Deno framework to create web application.
 
 ```ts
 import { Application } from "https://deno.land/x/abc@v1/mod.ts";
@@ -324,7 +338,7 @@ console.log(`🦕 pogo server running at http://127.0.0.1:8888/ 🦕`);
 
 ## oak 实战
 
-> 项目源码已同步开源: https://github.com/youngjuning/deno-oak-mongo-demo，下文只对遇到的坑做介绍，具体代码请查看源码。
+> 项目源码已同步开源: [youngjuning/deno-oak-mongo-demo](https://github.com/youngjuning/deno-oak-mongo-demo)，下文只对遇到的坑做介绍，具体代码请查看源码。
 
 ### 项目骨架
 
@@ -435,7 +449,7 @@ Successfully added user: {
 1
 ```
 
-### 脚本
+#### 脚本
 
 > 完成了 mongodb 的初始化配置，之后就可以使用 `./publish.sh` 一键发布应用。
 
@@ -469,3 +483,5 @@ Successfully added user: {
 | <img src="https://i.loli.net/2020/02/22/q2tLiGYvhIxm3Fl.jpg" width="200px"/> | <img src="https://i.loli.net/2020/02/23/q56X1eYZuITQpsj.png" width="200px"/> | <img src="https://i.loli.net/2020/07/28/6AyutjZ1XI4aUDV.jpg" width="200px"/> |
 
 本文首发于[杨俊宁的博客](https://youngjuning.js.org/)，创作不易，您的点赞👍是我坚持的动力！！！
+
+[🏆 技术专题第一期 | 聊聊 Deno的一些事儿......](https://juejin.im/post/5f1d1d97f265da22b6495ed2)
