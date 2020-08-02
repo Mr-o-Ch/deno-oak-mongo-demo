@@ -325,28 +325,27 @@ console.log(`🦕 pogo server running at http://127.0.0.1:8888/ 🦕`);
 ```shell
 .
 ├── Dockerfile
-├── README.md
-├── config
+├── config # 配置文件
 │   └── db.ts
-├── deps.ts
-├── handlers //
+├── deps.ts # 官方推荐的依赖管理方式
+├── controllers # 存放路由处理器
 │   ├── createBooks.ts
 │   ├── deleteBook.ts
 │   ├── getBookDetails.ts
 │   ├── getBooks.ts
 │   ├── notFound.ts
 │   └── updateBook.ts
-├── middlewares
+├── middlewares # 存放中间件，用于处理每个请求
 │   └── error.ts
-├── models
+├── models # 存放模型定义
 │   └── Book.ts
-├── publish.sh
-├── router.ts
-├── server.ts
-├── services
+├── publish.sh # 发布脚本
+├── router.ts # 定义路由信息
+├── server.ts # 服务入口文件
+├── services # 存放模型定义
 │   └── books.ts
-├── test.http
-└── utils
+├── test.http # VSCode REST Client
+└── utils # 工具函数
     └── getParams.ts
 ```
 
