@@ -1,5 +1,7 @@
 import { MongoClient } from "../deps.ts";
-import { DB_HOST_URL, DB_NAME } from "./env.ts";
+
+const DB_HOST_URL = Deno.env.get("DB_HOST_URL") || "mongodb://localhost:27017";
+const DB_NAME = Deno.env.get("DB_NAME") || "juejin";
 
 // 创建连接
 const client = new MongoClient();

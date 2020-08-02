@@ -5,17 +5,16 @@ EXPOSE 1994
 
 WORKDIR /app
 
-# Prefer not to run as root.
-USER deno
+USER root
 
 # Cache the dependencies as a layer (the following two steps are re-run only when deps.ts is modified).
 # Ideally cache deps.ts will download and compile _all_ external files used in main.ts.
 COPY deps.ts .
-RUN deno cache deps.ts
+RUN deno cache --unstable deps.ts
 
 # These steps will be re-run upon each file change in your working directory:
 ADD . .
 # Compile the main app so that it doesn't need to be compiled each startup/entry.
-RUN deno cache server.ts
+RUN deno cache --unstable server.ts
 
-CMD ["run", "--allow-read", "--allow-env", "--allow-net", "--unstable", "server.ts"]
+CMD ["run", "--allow-read", "--allow-write", "--allow-env", "--allow-net", "--allow-plugin", "--unstable", "--reload", "server.ts"]

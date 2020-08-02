@@ -9,6 +9,9 @@ import deleteBook from "./handlers/deleteBook.ts";
 const router = new Router();
 
 router
+  .get("/", (ctx) => {
+    ctx.response.body = "Hello World!";
+  })
   .get("/books", getBooks)
   .post("/books", createBooks)
   .get("/books/getBookDetails", getBookDetails)

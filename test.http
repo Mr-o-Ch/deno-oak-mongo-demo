@@ -1,4 +1,4 @@
-@host=http://127.0.0.1:1994
+@host=http://127.0.0.1:1998
 
 ###
 
@@ -21,6 +21,11 @@ content-type: application/json; charset=utf-8
     "cover_img": "https://i.loli.net/2020/08/02/nmO245CxtqSEiVX.png"
   }
 ]
+
+
+###
+
+GET {{host}} HTTP/1.1
 
 ###
 

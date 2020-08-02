@@ -22,9 +22,9 @@ docker run -d \
 docker build -t ${APP_NAME} .
 
 # 启动新容器
-docker run -d \
+docker run -it \
   --restart always \
-  --link mongo:mongo \
-  -p 1998:1994 \
   --name ${APP_NAME} \
+  -p 1998:1994 \
+  --link mongo:mongo \
   ${APP_NAME}
