@@ -9,7 +9,7 @@ import deleteBook from "./handlers/deleteBook.ts";
 const router = new Router();
 
 router
-  .get("/", (ctx) => {
+  .get("/checkHealth", (ctx) => {
     ctx.response.body = "Hello World!";
   })
   .get("/books", getBooks)

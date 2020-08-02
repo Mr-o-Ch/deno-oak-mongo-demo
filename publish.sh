@@ -22,9 +22,11 @@ docker run -d \
 docker build -t ${APP_NAME} .
 
 # 启动新容器
-docker run -it \
+docker run -d \
   --restart always \
   --name ${APP_NAME} \
-  -p 1998:1994 \
-  --link mongo:mongo \
+  -p 1998:1998 \
+  --link mongo:deno_mongo \
   ${APP_NAME}
+
+echo 🦕 server running at http://127.0.0.1:1998/ 🦕

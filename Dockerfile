@@ -1,7 +1,7 @@
 FROM hayd/alpine-deno
 
 # The port that your application listens to.
-EXPOSE 1994
+EXPOSE 1998
 
 WORKDIR /app
 
@@ -17,4 +17,4 @@ ADD . .
 # Compile the main app so that it doesn't need to be compiled each startup/entry.
 RUN deno cache --unstable server.ts
 
-CMD ["run", "--allow-read", "--allow-write", "--allow-env", "--allow-net", "--allow-plugin", "--unstable", "--reload", "server.ts"]
+CMD ["run", "--allow-read", "--allow-write", "--allow-env", "--allow-net", "--allow-plugin", "--unstable", "server.ts"]
