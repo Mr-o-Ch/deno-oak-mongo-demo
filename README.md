@@ -322,6 +322,34 @@ console.log(`🦕 pogo server running at http://127.0.0.1:8888/ 🦕`);
 
 ### 项目骨架
 
+```shell
+.
+├── Dockerfile
+├── README.md
+├── config
+│   └── db.ts
+├── deps.ts
+├── handlers //
+│   ├── createBooks.ts
+│   ├── deleteBook.ts
+│   ├── getBookDetails.ts
+│   ├── getBooks.ts
+│   ├── notFound.ts
+│   └── updateBook.ts
+├── middlewares
+│   └── error.ts
+├── models
+│   └── Book.ts
+├── publish.sh
+├── router.ts
+├── server.ts
+├── services
+│   └── books.ts
+├── test.http
+└── utils
+    └── getParams.ts
+```
+
 ## 插件推荐
 
 ### [denv](https://deno.land/x/denv#denv)

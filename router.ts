@@ -1,10 +1,10 @@
 import { Router } from "./deps.ts";
 
-import getBooks from "./handlers/getBooks.ts";
-import getBookDetails from "./handlers/getBookDetails.ts";
-import createBooks from "./handlers/createBooks.ts";
-import updateBook from "./handlers/updateBook.ts";
-import deleteBook from "./handlers/deleteBook.ts";
+import getBooks from "./controllers/getBooks.ts";
+import getBookDetails from "./controllers/getBookDetails.ts";
+import createBooks from "./controllers/createBooks.ts";
+import updateBook from "./controllers/updateBook.ts";
+import deleteBook from "./controllers/deleteBook.ts";
 
 const router = new Router();
 
