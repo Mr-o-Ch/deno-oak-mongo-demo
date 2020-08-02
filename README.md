@@ -4,6 +4,10 @@
 
 大家好，我是俊宁，这是一篇介绍如何使用 Deno 构建 HTTP Server 的实践指南，如果你还不了解Deno是什么，可以移步我的另一篇[Deno入门文章](https://juejin.im/post/5f1d4065f265da22d8344dc6)。
 
+本文还使用到了 Docker，如果不熟悉可以看一下 [一个前端工程师的Docker学习笔记【持续更新】](https://juejin.im/post/6844904111243001869)。
+
+mongodb 入门可以看一下 [MongoDB 教程](https://www.runoob.com/mongodb/mongodb-tutorial.html)
+
 ## 环境准备
 
 - deno: 使用 `deno -V` 查看是否正确安装了 deno
@@ -320,10 +324,13 @@ console.log(`🦕 pogo server running at http://127.0.0.1:8888/ 🦕`);
 
 ## oak 实战
 
+> 项目源码已同步开源: https://github.com/youngjuning/deno-oak-mongo-demo，下文只对遇到的坑做介绍，具体代码请查看源码。
+
 ### 项目骨架
 
 ```shell
 .
+├── .env # 使用 denv 插件来获取
 ├── Dockerfile
 ├── config # 配置文件
 │   └── db.ts
@@ -344,54 +351,54 @@ console.log(`🦕 pogo server running at http://127.0.0.1:8888/ 🦕`);
 ├── server.ts # 服务入口文件
 ├── services # 存放模型定义
 │   └── books.ts
-├── test.http # VSCode REST Client
+├── test.http # VSCode REST Client 文件，用来调试接口
 └── utils # 工具函数
-    └── getParams.ts
+    └── getParams.ts # 将 ctx.request.url.search 转成对象
 ```
 
-## 插件推荐
+### 遇到的坑
 
-### [denv](https://deno.land/x/denv#denv)
+> 作为一个前端工程师，为了写这篇文章，专门学了 mongodb。由于第一次接触，遇到最多的坑也是关于它的。
 
-一个适用于 Deno 的类似于 [dotenv](https://github.com/motdotla/dotenv)的插件
+#### 多容器链接
 
-**使用**
-
-你可以直接导入它，然后就可以使用和它同级目录的`.env` 文件：
-
-```ts
-import "https://deno.land/x/denv/mod.ts";
-console.log(Deno.env.get("HOME"));  // e.g. outputs "/home/alice"
-console.log(Deno.env.get("MADE_UP_VAR"));  // outputs "Undefined"
-```
-
-**Env File 规则**
-
-除了 `double quoted values expand new lines` 没有实现，其他的规则和 dotenv 一样。
-
-## 打包
-
-`deno bundle` 自带打包和 tree shaking 功能，可以将我们的代码打包成单文件
-
-```shell
-$ deno bundle ./src/index.ts ./dist/index.js
-```
-
-`deno install` 可以将我们的代码生成可执行文件进行直接使用
-
-```shell
-$ deno install --allow-read  --allow-net --allow-write -n youngjuning ./src/index.ts
-```
-
-deno的可执行文件默认都放在 `/Users/yangjunning/.deno/bin/` 目录下，我们需要将它注册到环境变量中:
+1、使用 `--link` 参数链接 mongo 容器，deno_mongo 是我们指定的映射到 juejin 容器内的数据库别名（这个很重要，连接数据库时要用）
 
 ```sh
-$ export PATH="/Users/yangjunning/.deno/bin:$PATH"
+docker run -d \
+  --restart always \
+  --name mongo \
+  -v mongo_configdb:/data/configdb \
+  -v mongo_data:/data/db \
+  -p 27017:27017 \
+  mongo \
+  --auth
+docker run -d \
+  --restart always \
+  --name juejin \
+  -p 1998:1998 \
+  --link mongo:deno_mongo \
+  juejin
 ```
 
-## mongodb & docker
+2、跨容器连接时不设置身份校验，开启服务端无法连接上mongo数据库，所以必须事先配置好 mongodb 的账号密码，并通过 `mongodb://root:123456@deno_mongo:27017/` 的形式连接。
 
-### 初始配置
+3、虽然不开启 `--auth` 是可以使用 mongo 的，但是这样不安全，强烈建议启动容器的时候加上 `--auth` 参数。
+
+#### deno_mongo
+
+这个插件在 run 起来的时候依赖的文件在 github 上，我卡在这里一下午。docker 启动项目后，由于容器内访问不了 github，导致一直失败。
+
+幸运的是，码云可以同步 github 上的项目，coding 可以上传单文件不超过 20M 的文件，我成功地完成了这篇文章最后的一步：docker 部署项目。
+
+- [插件地址](https://gitee.com/yangjunning/deno_mongo/raw/master/mod.ts)
+- [依赖的文件地址](https://younguning.coding.net/p/deno_mongo/d/deno_mongo/git/raw/master)
+
+### 使用
+
+其他部分就没什么好说了，clone 代码后，需要先配置一下 mongodb。然后再改代码，就是直接执行 `./publish.sh` 就可以应用更改。
+
+#### mongodb 初始配置
 
 ```sh
 # 不带权限校验的模式开启 mongo
@@ -428,127 +435,30 @@ Successfully added user: {
 1
 ```
 
-### 启动 mongodb
+### 脚本
 
-```sh
-$ docker run -d \
-  --restart always \
-  --name mongo \
-  -v mongo_data:/data/db \
-  -p 27017:27017 \
-  mongo \
-  --auth
-```
+> 完成了 mongodb 的初始化配置，之后就可以使用 `./publish.sh` 一键发布应用。
 
-## Docker 部署
-
-### deps.ts
-
-```ts
-export { Application } from "https://deno.land/x/oak/mod.ts";
-```
-
-### server.ts
-
-```ts
-import "https://deno.land/x/denv/mod.ts";
-import { Application } from "./deps.ts";
-
-const APP_NAME = Deno.env.get("APP_NAME") || 'oak'
-const APP_HOST = Deno.env.get("APP_HOST") || '127.0.0.1'
-
-const app = new Application();
-
-// Hello World!
-app.use((ctx) => {
-  ctx.response.body = "Hello World!";
-});
-
-console.log(`🦕 ${APP_NAME} running at http://${APP_HOST}:1998/ 🦕`);
-
-await app.listen({ port: 1998 });
-```
-
-### .env
-
-使用 `.env` 是为了在脚本和程序间共享变量，方便之后统一修改。
-
-```
-APP_HOST_NAME=127.0.0.1
-APP_NAME=oak-server
-```
-
-### Dockerfile
-
-```s
-FROM hayd/alpine-deno
-
-# The port that your application listens to.
-EXPOSE 1998
-
-WORKDIR /app
-
-# Prefer not to run as root.
-USER deno
-
-# Cache the dependencies as a layer (the following two steps are re-run only when deps.ts is modified).
-# Ideally cache deps.ts will download and compile _all_ external files used in main.ts.
-COPY deps.ts .
-RUN deno cache deps.ts
-
-# These steps will be re-run upon each file change in your working directory:
-ADD . .
-# Compile the main app so that it doesn't need to be compiled each startup/entry.
-RUN deno cache server.ts
-
-CMD ["run", "--allow-read", "--allow-env", "--allow-net", "server.ts"]
-```
-
-### publish.sh
-
-```sh
-#!/bin/bash
-ENV_FILE=$(cd ./$(dirname ${BASH_SOURCE[0]}); pwd )
-source $ENV_FILE/.env
-_APP_NAME=$APP_NAME
-APP_NAME=${_APP_NAME:-"deno_server"}
-
-# 停止已有容器
-docker rm -f ${APP_NAME}
-docker rm -f mongo-oak
-
-# 启动 mongo 容器
-docker run -itd \
-  --restart always \
-  --name mongo-oak \
-  -v mongo_data_oak:/data/db \
-  -p 27017:27017 \
-  --auth
-  mongo
-
-# 构建新镜像
-docker build -t ${APP_NAME} .
-
-# 启动新容器
-docker run -itd \
-  --restart always \
-  --link mongo-oak:mongo \
-  -p 1998:1998 \
-  --name ${APP_NAME} \
-  ${APP_NAME}
-```
-
-### 使用
-
-1、给脚本赋予可执行权限：`chmod a+x ./publish.sh`
-
-2、构建镜像并发布容器：`./publish.sh`
+1. 给脚本赋予可执行权限：`chmod a+x ./publish.sh`
+2. 构建镜像并发布容器：`./publish.sh`
 
 ## 参考
 
 - [我为 VS Code 开发了一个 Deno 插件](https://juejin.im/post/5c81c1e8e51d45535c4fe5c2)
 - [VScode中测试接口代替postman](https://blog.csdn.net/weixin_43363871/article/details/104058898)
 - [Docker容器化部署尝试——多容器通信（node + mongoDB + nginx）](https://juejin.im/post/6844903741523492877)
+- [了不起的 Deno 实战篇](https://juejin.im/post/6844904162321252360#heading-21)
+- [Deno快速入门指南](https://www.bilibili.com/video/BV1A5411x7bg)
+- [Write a small API using Deno](https://dev.to/kryz/write-a-small-api-using-deno-1cl0)
+- [5 Ways to Build a HTTP Server With Deno](https://medium.com/@tomanagle/5-ways-to-build-a-http-server-with-deno-3169389118aa)
+- [Create a server with deno and mongo.](https://dev.to/slimhmidi/create-a-server-with-deno-and-mongo-206l)
+- [【译】Deno + MongoDB 构建 CRUD API](https://mp.weixin.qq.com/s/9lgdrAXA72__i2lkzj2GNA)
+
+## 后续
+
+后续，我想基于本文所述的架构，开发一个婚礼请柬小程序的后台，之前不会操作数据库，曾想使用 leancloud。奋战两天之后，妈妈再也不担心我不会写接口了。最后来放上一只喝奶茶的吉祥物：
+
+![](https://i.loli.net/2020/08/03/4VM2kKtZS1Pazwo.png)
 
 ## Catch Me
 
