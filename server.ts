@@ -2,7 +2,7 @@ import "https://deno.land/x/denv/mod.ts";
 import { Application } from "./deps.ts";
 import router from "./router.ts";
 
-import errorMiddleware from "./middleware/error.ts";
+import errorMiddleware from "./middlewares/error.ts";
 // 初始化
 const app = new Application();
 

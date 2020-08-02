@@ -428,8 +428,6 @@ import "https://deno.land/x/denv/mod.ts";
 import { Application } from "./deps.ts";
 
 const APP_NAME = Deno.env.get("APP_NAME") || 'oak'
-const APP_PORT = Deno.env.get("APP_PORT") || 1994
-const EXPORT = Deno.env.get("APP_HOST") || 1998
 const APP_HOST = Deno.env.get("APP_HOST") || '127.0.0.1'
 
 const app = new Application();
@@ -439,9 +437,9 @@ app.use((ctx) => {
   ctx.response.body = "Hello World!";
 });
 
-console.log(`🦕 ${APP_NAME} running at http://${APP_HOST}:${EXPORT}/ 🦕`);
+console.log(`🦕 ${APP_NAME} running at http://${APP_HOST}:1998/ 🦕`);
 
-await app.listen({ port: Number(APP_PORT) });
+await app.listen({ port: 1998 });
 ```
 
 ### .env
@@ -451,8 +449,6 @@ await app.listen({ port: Number(APP_PORT) });
 ```
 APP_HOST_NAME=127.0.0.1
 APP_NAME=oak-server
-APP_PORT=1994
-EXPORT=1998
 ```
 
 ### Dockerfile
@@ -461,7 +457,7 @@ EXPORT=1998
 FROM hayd/alpine-deno
 
 # The port that your application listens to.
-EXPOSE 1994
+EXPOSE 1998
 
 WORKDIR /app
 
@@ -510,7 +506,7 @@ docker build -t ${APP_NAME} .
 docker run -itd \
   --restart always \
   --link mongo-oak:mongo \
-  -p 1998:1994 \
+  -p 1998:1998 \
   --name ${APP_NAME} \
   ${APP_NAME}
 ```
@@ -525,6 +521,7 @@ docker run -itd \
 
 - [我为 VS Code 开发了一个 Deno 插件](https://juejin.im/post/5c81c1e8e51d45535c4fe5c2)
 - [VScode中测试接口代替postman](https://blog.csdn.net/weixin_43363871/article/details/104058898)
+- [Docker容器化部署尝试——多容器通信（node + mongoDB + nginx）](https://juejin.im/post/6844903741523492877)
 
 ## Catch Me
 
